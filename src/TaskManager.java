@@ -7,21 +7,28 @@ class TaskManager {
     private final HashMap<Integer, Epic> epics = new HashMap<>();
     private int id = 0;
 
-    public void addTask(Task task) {
+    public Task addTask(Task task) {
         task.setId(id++);
         tasks.put(task.getId(), task);
+        return task;
     }
 
-    public void addEpic(Epic epic) {
+    public Epic addEpic(Epic epic) {
         epic.setId(id++);
         epics.put(epic.getId(), epic);
+        return epic;
     }
 
-    public void addSubtask(Subtask subtask) {
+    public Subtask addSubtask(Subtask subtask) {
+        if (!epics.containsKey(subtask.getEpicId())) {
+            System.out.println("Epic not found");
+            return subtask;
+        }
         subtask.setId(id++);
         subtasks.put(subtask.getId(), subtask);
         epics.get(subtask.getEpicId()).addSubtask(subtask.getId());
         updateEpicStatus(subtask.getEpicId());
+        return subtask;
     }
 
     public ArrayList<Task> getAllTasks() {
@@ -49,6 +56,7 @@ class TaskManager {
         subtasks.clear();
         for (Epic epic : epics.values()) {
             epic.clearSubtasks();
+            epic.setStatus(Status.NEW);
         }
     }
 
@@ -108,13 +116,17 @@ class TaskManager {
 
     public void deleteSubtask(int id) {
         Subtask subtask = subtasks.get(id);
-        if (subtask != null) {
-            Epic epic = epics.get(subtask.getEpicId());
-            if (epic != null) {
-                epic.removeSubtask(id);
-                updateEpicStatus(subtask.getEpicId());
-            }
+        if (subtask == null) {
+            System.out.println("Subtask not found");
+            return;
         }
+        Epic epic = epics.get(subtask.getEpicId());
+        if (epic == null) {
+            System.out.println("Epic not found");
+            return;
+        }
+        epic.removeSubtask(id);
+        updateEpicStatus(subtask.getEpicId());
         subtasks.remove(id);
     }
 
