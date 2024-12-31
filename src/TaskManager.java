@@ -28,7 +28,7 @@ class TaskManager {
         subtasks.put(subtask.getId(), subtask);
         epics.get(subtask.getEpicId()).addSubtask(subtask.getId());
         updateEpicStatus(subtask.getEpicId());
-        return subtask;
+        return null;
     }
 
     public ArrayList<Task> getAllTasks() {
@@ -56,7 +56,7 @@ class TaskManager {
         subtasks.clear();
         for (Epic epic : epics.values()) {
             epic.clearSubtasks();
-            epic.setStatus(Status.NEW);
+            updateEpicStatus(epic.getId());
         }
     }
 
