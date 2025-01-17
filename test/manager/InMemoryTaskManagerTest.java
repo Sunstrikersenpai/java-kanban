@@ -26,6 +26,7 @@ class InMemoryTaskManagerTest {
     @Test
     void addTaskPreserveTaskData() {
         Task task = new Task("Task 1", "Description 1", Status.NEW);
+        task.setId(1);
         Task taskCopy = new Task(task);
         taskManager.addTask(task);
 
@@ -206,7 +207,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void addSubtaskShouldNotAllowSubtaskToBeItsOwnEpic() {
+    void addSubtaskNotAllowSubtaskToBeItsOwnEpic() {
         Epic epic = new Epic("Epic 1", "Description 1");
         taskManager.addEpic(epic);
         Subtask subtask = new Subtask("Subtask", "Description", Status.NEW, 1);
