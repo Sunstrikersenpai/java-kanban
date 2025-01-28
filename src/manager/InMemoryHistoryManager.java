@@ -8,10 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    Node<Task> tail;
-    Node<Task> head;
+   private Node<Task> tail;
+   private Node<Task> head;
 
-    HashMap<Integer, Node<Task>> historyMap = new HashMap<>();
+   private final HashMap<Integer, Node<Task>> historyMap = new HashMap<>();
 
     private void linkLast(Task task) {
         Node<Task> newNode = new Node<>(task);
@@ -19,42 +19,42 @@ public class InMemoryHistoryManager implements HistoryManager {
             tail = newNode;
             head = newNode;
         } else {
-            tail.next = newNode;
-            newNode.prev = tail;
+            tail.setNext(newNode);
+            newNode.setPrev(tail);
             tail = newNode;
         }
     }
 
     private void removeNode(Node<Task> node) {
         if (node == null) return;
-        if (node.prev == null) {
-            head = node.next;
+        if (node.getPrev() == null) {
+            head = node.getNext();
             if (head != null) {
-                head.prev = null;
+                head.setPrev(null);
             } else {
                 tail = null;
             }
             return;
         }
-        if (node.next == null) {
-            tail = node.prev;
+        if (node.getNext() == null) {
+            tail = node.getPrev();
             if (tail != null) {
-                tail.next = null;
+                tail.setNext(null);
             } else {
                 head = null;
             }
             return;
         }
-        node.prev.next = node.next;
-        node.next.prev = node.prev;
+        node.getPrev().setNext(node.getNext());
+        node.getNext().setPrev(node.getPrev());
     }
 
     private ArrayList<Task> getTasks() {
         ArrayList<Task> tasksList = new ArrayList<>();
         Node<Task> node = head;
         while (node != null) {
-            tasksList.add(node.task);
-            node = node.next;
+            tasksList.add(node.getTask());
+            node = node.getNext();
         }
         return tasksList;
     }
