@@ -26,7 +26,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         }
     }
 
-    //
     public void save() {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(this.file.toFile(), StandardCharsets.UTF_8))) {
             bw.write("id,type,name,status,description,epicId\n");

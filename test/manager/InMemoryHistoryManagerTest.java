@@ -21,9 +21,9 @@ class InMemoryHistoryManagerTest {
         historyManager.add(task1);
         List<Task> history = historyManager.getHistory();
 
-        assertEquals(2,history.size());
-        assertNotEquals(history.get(0).getDescription(),history.get(1).getDescription());
-        assertNotEquals(history.get(0).getTitle(),history.get(1).getTitle());
+        assertEquals(2, history.size());
+        assertNotEquals(history.get(0).getDescription(), history.get(1).getDescription());
+        assertNotEquals(history.get(0).getTitle(), history.get(1).getTitle());
     }
 
 }
