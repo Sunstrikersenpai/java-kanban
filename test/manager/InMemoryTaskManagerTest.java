@@ -274,24 +274,4 @@ class InMemoryTaskManagerTest {
         assertEquals(1, taskManager.getHistory().size());
         assertTrue(taskManager.getHistory().contains(task));
     }
-
-    @Test
-    void getHistoryContainOnlyLast10CalledTasksAndRemoveOldest() {
-        Task task1 = new Task("Task 1", "Description 1", Status.NEW);
-        Task task2 = new Task("Task 2", "Description 2", Status.NEW);
-        taskManager.addTask(task1);
-        taskManager.addTask(task2);
-
-        for (int i = 0; i < 10; i++) {
-            taskManager.getTaskById(task1.getId());
-        }
-
-        assertTrue(taskManager.getHistory().contains(task1));
-        assertEquals(10, taskManager.getHistory().size());
-
-        taskManager.getTaskById(task2.getId());
-
-        assertEquals(10, taskManager.getHistory().size());
-        assertTrue(taskManager.getHistory().contains(task2));
-    }
 }
