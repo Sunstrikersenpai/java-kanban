@@ -11,13 +11,12 @@ public class Epic extends Task {
     }
 
     public void addSubtask(int subtaskId) {
-        if(this.getId()==subtaskId) {
+        if (this.getId() == subtaskId) {
             System.out.println("cannotAddEpicAsSubtaskToItself");
             return;
         }
         subtaskIds.add(subtaskId);
     }
-
 
 
     public ArrayList<Integer> getSubtaskIds() {
