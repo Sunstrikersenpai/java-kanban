@@ -1,5 +1,7 @@
 package tasks;
 
+import manager.TaskType;
+
 import java.util.Objects;
 
 public class Subtask extends Task {
@@ -7,6 +9,11 @@ public class Subtask extends Task {
 
     public Subtask(String title, String description, Status status, int epicId) {
         super(title, description, status);
+        this.epicId = epicId;
+    }
+
+    public Subtask(int id, TaskType type, Status status, String title, String description, int epicId) {
+        super(id, type, status, title, description);
         this.epicId = epicId;
     }
 
