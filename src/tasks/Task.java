@@ -15,17 +15,13 @@ public class Task {
         return taskType;
     }
 
-    public void setTaskType(TaskType taskType) {
-        this.taskType = taskType;
-    }
-
     public Task(String title, String description, Status status) {
         this.title = title;
         this.description = description;
         this.status = status;
     }
 
-    public Task(int id, TaskType type, Status status, String title, String description) {
+    public Task(int id, Status status, String title, String description, TaskType type) {
         this.title = title;
         this.description = description;
         this.status = status;

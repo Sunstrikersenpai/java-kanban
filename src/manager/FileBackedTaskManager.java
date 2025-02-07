@@ -1,9 +1,6 @@
 package manager;
 
-import tasks.Epic;
-import tasks.Status;
-import tasks.Subtask;
-import tasks.Task;
+import tasks.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -11,12 +8,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
-    Path file;
+public class FileBackedTaskManager extends InMemoryTaskManager {
+    private final Path file;
 
     public FileBackedTaskManager(Path file) {
         this.file = file;
-
         try {
             if (!Files.exists(file)) {
                 Files.createFile(file);
@@ -26,7 +22,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         }
     }
 
-    public void save() {
+    private void save() {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(this.file.toFile(), StandardCharsets.UTF_8))) {
             bw.write("id,type,name,status,description,epicId\n");
             for (Task task : getAllTasks()) {
@@ -53,9 +49,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
         try (BufferedReader br = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
             br.readLine();
-            while (br.ready()) {
-                Task task = taskFromString(br.readLine());
-                fbm.loadTask(task);
+            String line;
+            while ((line = br.readLine()) != null) {
+                Task task = taskFromString(line);
+                switch (task.getTaskType()) {
+                    case TASK -> fbm.loadTask(task);
+                    case EPIC -> fbm.loadTask((Epic) task);
+                    case SUBTASK -> fbm.loadTask((Subtask) task);
+                }
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка загрузки из файла", e);
@@ -63,23 +64,22 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         return fbm;
     }
 
+    private void loadTask(Subtask subtask) {
+        subtasks.put(subtask.getId(), subtask);
+        epics.get(subtask.getEpicId()).addSubtask(subtask.getId());
+    }
+
+    private void loadTask(Epic epic) {
+        epics.put(epic.getId(), epic);
+    }
+
     private void loadTask(Task task) {
-        if (task instanceof Epic epic) {
-            super.addEpic(epic);
-            epic.setTaskType(TaskType.EPIC);
-        } else if (task instanceof Subtask subtask) {
-            super.addSubtask(subtask);
-            subtask.setTaskType(TaskType.SUBTASK);
-        } else {
-            super.addTask(task);
-            task.setTaskType(TaskType.TASK);
-        }
+        tasks.put(task.getId(), task);
     }
 
     @Override
     public Task addTask(Task task) {
         super.addTask(task);
-        task.setTaskType(TaskType.TASK);
         save();
         return task;
     }
@@ -87,7 +87,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     @Override
     public Epic addEpic(Epic epic) {
         super.addEpic(epic);
-        epic.setTaskType(TaskType.EPIC);
         save();
         return epic;
     }
@@ -95,12 +94,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     @Override
     public Subtask addSubtask(Subtask subtask) {
         super.addSubtask(subtask);
-        subtask.setTaskType(TaskType.SUBTASK);
         save();
         return subtask;
     }
 
-    public static Task taskFromString(String value) {
+    private static Task taskFromString(String value) {
         String[] ar = value.split(",");
         int id = Integer.parseInt(ar[0]);
         TaskType type = TaskType.valueOf(ar[1]);
@@ -108,42 +106,30 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         String title = ar[3];
         String description = ar[4];
         if (type == TaskType.SUBTASK) {
-            return new Subtask(id, type, status, title, description, Integer.parseInt(ar[5]));
+            return new Subtask(id, status, title, description, Integer.parseInt(ar[5]));
         }
         if (type == TaskType.EPIC) {
-            return new Epic(id, type, status, title, description);
+            return new Epic(id, status, title, description);
         }
-
-        return new Task(id, type, status, title, description);
+        return new Task(id, status, title, description, type);
     }
 
     private static String taskToString(Task task) {
-        StringBuilder toReturn = new StringBuilder(String.join(",", String.valueOf(task.getId()), task.getTaskType().toString(), task.getStatus().toString(), task.getTitle(), task.getDescription()));
-        if (task instanceof Subtask) {
+        StringBuilder toReturn = new StringBuilder(String.join(",",
+                String.valueOf(task.getId()),
+                task.getTaskType().toString(),
+                task.getStatus().toString(),
+                task.getTitle(),
+                task.getDescription()));
+        if (task.getTaskType() == TaskType.SUBTASK) {
             toReturn.append(",").append(((Subtask) task).getEpicId());
         }
         return toReturn.toString();
     }
 
     public static void main(String[] args) {
-        Path filePath = Paths.get("java-kanban\\data\\data.csv");
-        /*FileBackedTaskManager manager = new FileBackedTaskManager(filePath);
-
-        Task task1 = new Task(1, TaskType.TASK, Status.NEW, "Task 1", "Description 1");
-        Task task2 = new Task(2, TaskType.TASK, Status.NEW, "Task 2", "Description 2");
-        manager.addTask(task1);
-        manager.addTask(task2);
-
-        Epic epic1 = new Epic("Epic 1", "Epic description");
-        manager.addEpic(epic1);
-
-        Subtask subtask1 = new Subtask("Subtask 1", "Subtask1 description", Status.NEW, epic1.getId());
-        Subtask subtask2 = new Subtask("Subtask 2", "Subtask2 description", Status.IN_PROGRESS, epic1.getId());
-        manager.addSubtask(subtask1);
-        manager.addSubtask(subtask2);*/
-
+        Path filePath = Paths.get("data\\data.csv");
         FileBackedTaskManager loadedManager = loadFromFile(filePath.toFile());
-
         for (Task task : loadedManager.getAllTasks()) {
             System.out.println(task);
         }
