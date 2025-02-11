@@ -1,7 +1,5 @@
 package tasks;
 
-import manager.TaskType;
-
 import java.util.Objects;
 
 public class Subtask extends Task {
@@ -13,7 +11,7 @@ public class Subtask extends Task {
     }
 
     public Subtask(int id, Status status, String title, String description, int epicId) {
-        super(id, status, title, description, TaskType.SUBTASK);
+        super(id, status, title, description);
         this.epicId = epicId;
     }
 
@@ -43,4 +41,8 @@ public class Subtask extends Task {
         return Objects.hash(super.hashCode(), epicId);
     }
 
+    @Override
+    public TaskType getTaskType() {
+        return TaskType.SUBTASK;
+    }
 }

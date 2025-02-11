@@ -7,6 +7,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private final Path file;
@@ -50,13 +52,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         try (BufferedReader br = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
             br.readLine();
             String line;
+            List<Subtask> list = new ArrayList<>();
+
             while ((line = br.readLine()) != null) {
                 Task task = taskFromString(line);
                 switch (task.getTaskType()) {
                     case TASK -> fbm.loadTask(task);
                     case EPIC -> fbm.loadTask((Epic) task);
-                    case SUBTASK -> fbm.loadTask((Subtask) task);
+                    case SUBTASK -> list.add((Subtask) task);
                 }
+            }
+            for (Subtask subtask : list) {
+                fbm.loadTask(subtask);
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка загрузки из файла", e);
@@ -111,16 +118,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         if (type == TaskType.EPIC) {
             return new Epic(id, status, title, description);
         }
-        return new Task(id, status, title, description, type);
+        return new Task(id, status, title, description);
     }
 
     private static String taskToString(Task task) {
-        StringBuilder toReturn = new StringBuilder(String.join(",",
-                String.valueOf(task.getId()),
-                task.getTaskType().toString(),
-                task.getStatus().toString(),
-                task.getTitle(),
-                task.getDescription()));
+        StringBuilder toReturn = new StringBuilder(String.join(",", String.valueOf(task.getId()), task.getTaskType().toString(), task.getStatus().toString(), task.getTitle(), task.getDescription()));
         if (task.getTaskType() == TaskType.SUBTASK) {
             toReturn.append(",").append(((Subtask) task).getEpicId());
         }

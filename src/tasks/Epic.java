@@ -1,7 +1,5 @@
 package tasks;
 
-import manager.TaskType;
-
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -13,7 +11,12 @@ public class Epic extends Task {
     }
 
     public Epic(int id, Status status, String title, String description) {
-        super(id, status, title, description, TaskType.EPIC);
+        super(id, status, title, description);
+    }
+
+    @Override
+    public TaskType getTaskType() {
+        return TaskType.EPIC;
     }
 
     public void addSubtask(int subtaskId) {

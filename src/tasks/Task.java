@@ -1,7 +1,5 @@
 package tasks;
 
-import manager.TaskType;
-
 import java.util.Objects;
 
 public class Task {
@@ -9,10 +7,9 @@ public class Task {
     private String title;
     private String description;
     private Status status;
-    private TaskType taskType;
 
     public TaskType getTaskType() {
-        return taskType;
+        return TaskType.TASK;
     }
 
     public Task(String title, String description, Status status) {
@@ -21,12 +18,11 @@ public class Task {
         this.status = status;
     }
 
-    public Task(int id, Status status, String title, String description, TaskType type) {
+    public Task(int id, Status status, String title, String description) {
         this.title = title;
         this.description = description;
         this.status = status;
         this.id = id;
-        this.taskType = type;
     }
 
     public Task(Task task) {
@@ -34,7 +30,6 @@ public class Task {
         this.status = task.getStatus();
         this.description = task.getDescription();
         this.title = task.getTitle();
-        this.taskType = task.getTaskType();
     }
 
     public int getId() {
