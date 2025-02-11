@@ -8,10 +8,21 @@ public class Task {
     private String description;
     private Status status;
 
+    public TaskType getTaskType() {
+        return TaskType.TASK;
+    }
+
     public Task(String title, String description, Status status) {
         this.title = title;
         this.description = description;
         this.status = status;
+    }
+
+    public Task(int id, Status status, String title, String description) {
+        this.title = title;
+        this.description = description;
+        this.status = status;
+        this.id = id;
     }
 
     public Task(Task task) {
