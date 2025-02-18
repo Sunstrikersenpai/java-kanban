@@ -132,14 +132,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public static void main(String[] args) {
         Path filePath = Paths.get("data\\data.csv");
         FileBackedTaskManager loadedManager = loadFromFile(filePath.toFile());
-        for (Task task : loadedManager.getAllTasks()) {
-            System.out.println(task);
-        }
-        for (Epic epic : loadedManager.getAllEpics()) {
-            System.out.println(epic);
-        }
-        for (Subtask subtask : loadedManager.getAllSubtasks()) {
-            System.out.println(subtask);
-        }
+
+        loadedManager.getAllTasks().forEach(System.out::println);
+        loadedManager.getAllEpics().forEach(System.out::println);
+        loadedManager.getAllSubtasks().forEach(System.out::println);
     }
 }
