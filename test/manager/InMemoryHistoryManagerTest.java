@@ -12,6 +12,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class InMemoryHistoryManagerTest {
     private HistoryManager historyManager;
 
+    /*хорошее имя тестового метода
+    имяТестируемеогоМетода_чтоДолжноПроизойти_приКакихУсловиях (последняя часть оцпциональна)
+    add_addTaskToHistory
+            add_sameTaskMoveToTheEnd_taskAlreadyInHistory*/
     @BeforeEach
     void setUp() {
         historyManager = new InMemoryHistoryManager();

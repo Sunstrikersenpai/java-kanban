@@ -10,6 +10,15 @@ public class Epic extends Task {
         super(title, description, Status.NEW);
     }
 
+    public Epic(int id, Status status, String title, String description) {
+        super(id, status, title, description);
+    }
+
+    @Override
+    public TaskType getTaskType() {
+        return TaskType.EPIC;
+    }
+
     public void addSubtask(int subtaskId) {
         if (this.getId() == subtaskId) {
             System.out.println("cannotAddEpicAsSubtaskToItself");
