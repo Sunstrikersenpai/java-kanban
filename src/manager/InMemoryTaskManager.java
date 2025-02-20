@@ -18,6 +18,7 @@ public class InMemoryTaskManager implements TaskManager {
     protected TreeSet<Task> sortedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime));
     protected Map<LocalDateTime, Boolean> busySlots = new HashMap<>();
     private int id = 1;
+
     //Попытка сделать доп задание, это не О(1), но как быстрее сделать я не придумал
     protected boolean isValid(Task task) {
         if (task.getDuration() == null || task.getStartTime() == null) {
