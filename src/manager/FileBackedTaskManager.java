@@ -99,6 +99,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     @Override
     public Epic addEpic(Epic epic) {
         super.addEpic(epic);
+        save();
         return epic;
     }
 
@@ -119,8 +120,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String startTime = ar[5];
         String duration = ar[6];
         if (type == TaskType.SUBTASK) {
-            return setTimeAndReturnTask(new Subtask(id, status, title, description, Integer.parseInt(ar[7])),
-                    startTime, duration);
+            return setTimeAndReturnTask(new Subtask(id, status, title, description, Integer.parseInt(ar[7])), startTime, duration);
         }
         if (type == TaskType.EPIC) {
             if (startTime.equals("null") || duration.equals("null")) {
@@ -136,12 +136,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     protected static String taskToString(Task task) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-        String startTime = Optional.ofNullable(task.getStartTime()).map(t -> t.format(formatter))
-                .orElse("null");
+        String startTime = Optional.ofNullable(task.getStartTime()).map(t -> t.format(formatter)).orElse("null");
         String duration = Optional.ofNullable(task.getDuration()).map(Duration::toString).orElse("null");
 
-        StringBuilder toReturn = new StringBuilder(String.join(",", String.valueOf(task.getId()), task.getTaskType().toString(),
-                task.getStatus().toString(), task.getTitle(), task.getDescription(), startTime, duration));
+        StringBuilder toReturn = new StringBuilder(String.join(",", String.valueOf(task.getId()), task.getTaskType().toString(), task.getStatus().toString(), task.getTitle(), task.getDescription(), startTime, duration));
         if (task.getTaskType() == TaskType.SUBTASK) {
             toReturn.append(",").append(((Subtask) task).getEpicId());
         }

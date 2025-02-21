@@ -6,7 +6,7 @@ import tasks.Task;
 
 import java.time.Duration;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
 
@@ -25,6 +25,6 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
         task2.setStartTime(startTime);
         task2.setDuration(Duration.ofMinutes(60));
 
-        assertFalse(taskManager.isValid(task2));
+        assertThrows(IllegalArgumentException.class, () -> taskManager.addTask(task2));
     }
 }
