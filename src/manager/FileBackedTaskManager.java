@@ -6,9 +6,12 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private final Path file;
@@ -24,9 +27,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-    private void save() {
+    protected void save() {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(this.file.toFile(), StandardCharsets.UTF_8))) {
-            bw.write("id,type,name,status,description,epicId\n");
+            bw.write("id,type,name,status,description,startTime,duration,epicId\n");
             for (Task task : getAllTasks()) {
                 bw.write(taskToString(task) + "\n");
             }
@@ -73,6 +76,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private void loadTask(Subtask subtask) {
         subtasks.put(subtask.getId(), subtask);
+        addToSortedTasks(subtask);
         epics.get(subtask.getEpicId()).addSubtask(subtask.getId());
     }
 
@@ -82,6 +86,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private void loadTask(Task task) {
         tasks.put(task.getId(), task);
+        addToSortedTasks(task);
     }
 
     @Override
@@ -105,36 +110,49 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return subtask;
     }
 
-    private static Task taskFromString(String value) {
+    protected static Task taskFromString(String value) {
         String[] ar = value.split(",");
         int id = Integer.parseInt(ar[0]);
         TaskType type = TaskType.valueOf(ar[1]);
         Status status = Status.valueOf(ar[2]);
         String title = ar[3];
         String description = ar[4];
+        String startTime = ar[5];
+        String duration = ar[6];
         if (type == TaskType.SUBTASK) {
-            return new Subtask(id, status, title, description, Integer.parseInt(ar[5]));
+            return setTimeAndReturnTask(new Subtask(id, status, title, description, Integer.parseInt(ar[7])), startTime, duration);
         }
         if (type == TaskType.EPIC) {
-            return new Epic(id, status, title, description);
+            if (startTime.equals("null") || duration.equals("null")) {
+                return new Epic(id, status, title, description);
+            }
+            return setTimeAndReturnTask(new Epic(id, status, title, description), startTime, duration);
         }
-        return new Task(id, status, title, description);
+        if (startTime.equals("null") || duration.equals("null")) {
+            return new Task(id, status, title, description);
+        }
+        return setTimeAndReturnTask(new Task(id, status, title, description), startTime, duration);
     }
 
-    private static String taskToString(Task task) {
-        StringBuilder toReturn = new StringBuilder(String.join(",", String.valueOf(task.getId()), task.getTaskType().toString(), task.getStatus().toString(), task.getTitle(), task.getDescription()));
+    protected static String taskToString(Task task) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+        String startTime = Optional.ofNullable(task.getStartTime()).map(t -> t.format(formatter)).orElse("null");
+        String duration = Optional.ofNullable(task.getDuration()).map(Duration::toString).orElse("null");
+
+        StringBuilder toReturn = new StringBuilder(String.join(",", String.valueOf(task.getId()), task.getTaskType().toString(), task.getStatus().toString(), task.getTitle(), task.getDescription(), startTime, duration));
         if (task.getTaskType() == TaskType.SUBTASK) {
             toReturn.append(",").append(((Subtask) task).getEpicId());
         }
         return toReturn.toString();
     }
 
-    public static void main(String[] args) {
-        Path filePath = Paths.get("data\\data.csv");
-        FileBackedTaskManager loadedManager = loadFromFile(filePath.toFile());
+    private static Task setTimeAndReturnTask(Task task, String startTime, String duration) {
+        task.setStartTime(LocalDateTime.parse(startTime));
+        task.setDuration(Duration.parse(duration));
+        return task;
+    }
 
-        loadedManager.getAllTasks().forEach(System.out::println);
-        loadedManager.getAllEpics().forEach(System.out::println);
-        loadedManager.getAllSubtasks().forEach(System.out::println);
+    public static void main(String[] args) {
+
     }
 }
