@@ -1,5 +1,7 @@
 package manager;
 
+import exceptions.IntersectionException;
+import exceptions.NotFoundException;
 import tasks.Epic;
 import tasks.Status;
 import tasks.Subtask;
@@ -20,7 +22,7 @@ public class InMemoryTaskManager implements TaskManager {
     private int id = 1;
 
     protected boolean isValid(Task task) {
-        if (task.getDuration() == null || task.getStartTime() == null) {
+        if (task.getDuration() == null && task.getStartTime() == null) {
             return true;
         }
 
@@ -45,7 +47,7 @@ public class InMemoryTaskManager implements TaskManager {
 
         if (!isValid(task)) {
             id--;
-            throw new IllegalArgumentException("Время задачи пересекается с другими");
+            throw new IntersectionException("Время задачи пересекается с другими");
         }
 
         tasks.put(task.getId(), task);
@@ -74,7 +76,7 @@ public class InMemoryTaskManager implements TaskManager {
 
         if (!isValid(subtask)) {
             id--;
-            throw new IllegalArgumentException("Время задачи пересекается с другими");
+            throw new IntersectionException("Время задачи пересекается с другими");
         }
 
         subtasks.put(subtask.getId(), subtask);
@@ -173,10 +175,11 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateTask(Task task) {
         if (!tasks.containsKey(task.getId())) {
-            return;
+            throw new NotFoundException(task.getId());
         }
+
         if (!isValid(task)) {
-            throw new IllegalArgumentException("Время задачи пересекается с другими");
+            throw new IntersectionException("Время задачи пересекается с другими");
         }
 
         tasks.put(task.getId(), task);
@@ -196,7 +199,7 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
         if (!isValid(subtask)) {
-            throw new IllegalArgumentException("Время задачи пересекается с другими");
+            throw new IntersectionException("Время задачи пересекается с другими");
         }
         subtasks.put(subtask.getId(), subtask);
         updateEpicTimeAndStatus(subtask.getEpicId());
@@ -252,7 +255,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public TreeSet<Task> getPrioritizedTasks() {
+    public Set<Task> getPrioritizedTasks() {
         return sortedTasks;
     }
 

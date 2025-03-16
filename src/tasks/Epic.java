@@ -5,8 +5,9 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class Epic extends Task {
+
     private final ArrayList<Integer> subtaskIds = new ArrayList<>();
-    private LocalDateTime endTime;
+    private LocalDateTime endTime = null;
 
     public Epic(String title, String description) {
         super(title, description, Status.NEW);

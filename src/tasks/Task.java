@@ -20,6 +20,10 @@ public class Task {
         return startTime.plus(duration);
     }
 
+    public Task() {
+
+    }
+
     public Task(String title, String description, Status status) {
         this.title = title;
         this.description = description;
@@ -56,7 +60,7 @@ public class Task {
         this.startTime = startTime;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

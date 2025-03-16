@@ -1,5 +1,6 @@
 package manager;
 
+import exceptions.IntersectionException;
 import org.junit.jupiter.api.Test;
 import tasks.Status;
 import tasks.Task;
@@ -25,6 +26,6 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
         task2.setStartTime(startTime);
         task2.setDuration(Duration.ofMinutes(60));
 
-        assertThrows(IllegalArgumentException.class, () -> taskManager.addTask(task2));
+        assertThrows(IntersectionException.class, () -> taskManager.addTask(task2));
     }
 }
