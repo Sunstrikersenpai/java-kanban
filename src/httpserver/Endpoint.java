@@ -1,0 +1,24 @@
+package httpserver;
+
+public enum Endpoint {
+    GET_ALL_TASKS,
+    GET_TASK,
+    ADD_OR_UPD_TASK,
+    DELETE_TASK,
+
+    GET_ALL_SUBTASKS,
+    GET_SUBTASK,
+    ADD_OR_UPD_SUBTASK,
+    DELETE_SUBTASK,
+
+    GET_ALL_EPICS,
+    GET_EPIC,
+    ADD_OR_UPD_EPIC,
+    DELETE_EPIC,
+    GET_EPIC_SUBTASK,
+
+    GET_HISTORY,
+    GET_PRIORITIZED,
+
+    UNKNOWN
+}
